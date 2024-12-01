@@ -1,7 +1,7 @@
 {
     "name": "advanced_app",
     "short_name": "advanced_app",
-    "start_url": ".",
+    "start_url": "/",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
@@ -12,6 +12,11 @@
         {
             "src": "icons/Icon-192.png",
             "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "icons/144.png",
+            "sizes": "144x144",
             "type": "image/png"
         },
         {
@@ -30,6 +35,18 @@
             "sizes": "512x512",
             "type": "image/png",
             "purpose": "maskable"
+        }
+    ],
+    "screenshots": [
+        {
+            "src": "screenshots/pic1.png",
+            "sizes": "1920x1080",
+            "form_factor": "wide"
+        },
+        {
+            "src": "screenshots/pic2.png",
+            "sizes": "450x800",
+            "form_factor": "narrow"
         }
     ]
 }

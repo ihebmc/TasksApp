@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 class CounterApp extends StatefulWidget {
+  const CounterApp({super.key});
+
   @override
   _CounterAppState createState() => _CounterAppState();
 }
@@ -25,9 +27,9 @@ class _CounterAppState extends State<CounterApp> {
             children: [
               Text('Counter: $_counter'),
               ElevatedButton(
-                key: Key('incrementButton'),
+                key: const Key('incrementButton'),
                 onPressed: _incrementCounter,
-                child: Text('Increment'),
+                child: const Text('Increment'),
               ),
             ],
           ),
@@ -43,7 +45,7 @@ void main() {
 
     expect(find.text('Counter: 0'), findsOneWidget);
 
-    await tester.tap(find.byKey(Key('incrementButton')));
+    await tester.tap(find.byKey(const Key('incrementButton')));
     await tester.pump();
 
     expect(find.text('Counter: 1'), findsOneWidget);
