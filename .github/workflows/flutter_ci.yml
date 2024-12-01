@@ -11,22 +11,30 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+
+      # Setup Java
       - uses: actions/setup-java@v1
         with:
           java-version: '12.x'
+
+      # Install Flutter
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.10.0'
-      
+          flutter-version: '3.5.4'  # Specify the required Flutter version here
+
+      # Install dependencies
       - name: Install dependencies
         run: flutter pub get
-      
+
+      # Run unit tests
       - name: Run unit tests
         run: flutter test
 
+      # Run widget tests
       - name: Run widget tests
         run: flutter test test/widget
-      
+
+      # Run integration tests
       - name: Run integration tests
         run: flutter drive --target=test/integration/app_test.dart
 
@@ -35,15 +43,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+
+      # Setup Java
       - uses: actions/setup-java@v1
         with:
           java-version: '12.x'
+
+      # Install Flutter
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.10.0'
-      
+          flutter-version: '3.5.4'  # Ensure this is the required version
+
+      # Build Android APK
       - name: Build Android APK
         run: flutter build apk
-      
+
+      # Build iOS App
       - name: Build iOS App
         run: flutter build ios --release
