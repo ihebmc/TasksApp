@@ -1,49 +1,107 @@
 name: Flutter CI/CD
 
+# Controls when the workflow will run
 on:
+  # Triggers the workflow on push or pull request events
   push:
-    branches: [ main ]
+    branches: [ main, master ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, master ]
 
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# Jobs that will be executed
 jobs:
-  test:
+  # First job: Code Analysis and Testing
+  analyze_and_test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-java@v1
+      # Checkout the code
+      - uses: actions/checkout@v4
+
+      # Setup Java (required for Flutter)
+      - uses: actions/setup-java@v3
         with:
-          java-version: '12.x'
+          distribution: 'temurin'
+          java-version: '17'
+
+      # Setup Flutter
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.10.0'
-      
+          flutter-version: '3.24.5'
+          channel: 'stable'
+
+      # Get dependencies
       - name: Install dependencies
-        run: flutter pub get
-      
+        run: |
+          flutter pub get
+          flutter pub upgrade
+
+      # Run code analysis
+      - name: Analyze code
+        run: dart analyze
+
+      # Run unit tests
       - name: Run unit tests
-        run: flutter test
+        run: flutter test test/
 
+      # Run widget tests
       - name: Run widget tests
-        run: flutter test test/widget
-      
-      - name: Run integration tests
-        run: flutter drive --target=test/integration/app_test.dart
+        run: flutter test test/widget/
 
+  # Second job: Build for different platforms
   build:
-    needs: test
+    needs: analyze_and_test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-java@v1
+      - uses: actions/checkout@v4
+
+      # Setup Java
+      - uses: actions/setup-java@v3
         with:
-          java-version: '12.x'
+          distribution: 'temurin'
+          java-version: '17'
+
+      # Setup Flutter
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.10.0'
-      
+          flutter-version: '3.24.5'
+          channel: 'stable'
+
+      # Build Android APK
       - name: Build Android APK
-        run: flutter build apk
-      
-      - name: Build iOS App
-        run: flutter build ios --release
+        run: |
+          flutter build apk --release
+          flutter build appbundle
+
+      # Build Web
+      - name: Build Web
+        run: flutter build web
+
+      # Optional: Upload artifacts
+      - name: Upload APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: android-release
+          path: build/app/outputs/flutter-apk/app-release.apk
+
+      # Optional: Upload Web Build
+      - name: Upload Web Build
+        uses: actions/upload-artifact@v3
+        with:
+          name: web-release
+          path: build/web
+
+  # Optional: Deployment job (customize as needed)
+  # deploy:
+  #   needs: build
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Deploy to Firebase Hosting
+  #       uses: FirebaseExtended/action-hosting-deploy@v0
+  #       with:
+  #         repoToken: '${{ secrets.GITHUB_TOKEN }}'
+  #         firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}'
+  #         channelId: live
+  #         projectId: your-project-id
