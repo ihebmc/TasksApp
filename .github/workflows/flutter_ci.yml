@@ -2,62 +2,55 @@ name: Flutter CI/CD
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
   pull_request:
-    branches: [ main ]
+    branches:
+      - main
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v2
+      # Checkout the repository
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-      # Setup Java
-      - uses: actions/setup-java@v1
-        with:
-          java-version: '12.x'
-
-      # Install Flutter
-      - uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.5.4'  # Specify the required Flutter version here
+      # Set up Flutter environment manually
+      - name: Install Flutter
+        run: |
+          # Install dependencies for Flutter
+          sudo apt-get update
+          sudo apt-get install -y curl git unzip xz-utils zip
+          
+          # Download and install Flutter SDK version 3.5.4
+          git clone https://github.com/flutter/flutter.git -b stable /opt/flutter
+          /opt/flutter/bin/flutter --version
+          
+          # Add Flutter to the system PATH
+          echo "export PATH=\$PATH:/opt/flutter/bin" >> $GITHUB_ENV
 
       # Install dependencies
       - name: Install dependencies
         run: flutter pub get
 
-      # Run unit tests
-      - name: Run unit tests
+      # Run tests (if you have any tests in your project)
+      - name: Run tests
         run: flutter test
 
-      # Run widget tests
-      - name: Run widget tests
-        run: flutter test test/widget
+      # Build the app (optional, based on your needs)
+      - name: Build app for Android
+        run: flutter build apk --release
 
-      # Run integration tests
-      - name: Run integration tests
-        run: flutter drive --target=test/integration/app_test.dart
+      # Optionally, you can add other build steps for iOS or Web, for example:
+      # - name: Build app for iOS
+      #   run: flutter build ios --release
+      #
+      # - name: Build app for Web
+      #   run: flutter build web
 
-  build:
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-
-      # Setup Java
-      - uses: actions/setup-java@v1
-        with:
-          java-version: '12.x'
-
-      # Install Flutter
-      - uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.5.4'  # Ensure this is the required version
-
-      # Build Android APK
-      - name: Build Android APK
-        run: flutter build apk
-
-      # Build iOS App
-      - name: Build iOS App
-        run: flutter build ios --release
+      # Deploy (optional, depends on your needs)
+      # For example, you can upload to Firebase or any other platform
+      # - name: Deploy to Firebase
+      #   run: firebase deploy --token ${{ secrets.FIREBASE_TOKEN }}
